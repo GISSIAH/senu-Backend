@@ -124,32 +124,51 @@ exports.getRecent=(req,res)=>{
 			        (select hospitals.name,max(hospitals.time) max_date from hospitals group by hospitals.name) \
 			        b on hospitals.name = b.name and hospitals.time= b.max_date) as recent \
 	                full outer join h_locations on recent.name=h_locations.h_name",Hospital,{raw:true}).then(function(data){
-        var fts=[]
-        data[0].forEach(element => {
-            var ft = {"type":"Feature","properties":element};
-            fts.push(ft)
-        });
-        res.send(fts);
+                        
+                        var fts=[]
+                        data[0].forEach(element => {
+                            var ft = {"type":"Feature","properties":element,"geometry":{"type":"Point","coordinates":[parseFloat(element.lat),parseFloat(element.lng)]}};
+                            fts.push(ft)
+                        });
+                
+                        var coll ={
+                            "type": "FeatureCollection",
+                                "name": 'Latest',
+                                    "crs": { "type": "name", "properties": {"name":"urn:ogc:def:crs:OGC:1.3:CRS84" } },
+                                "features":fts
+                            }
+                
+                        res.send(coll);
     });
 }
+//gets specific attributes plus locations
 exports.getSpecific = (req,res)=>{
     var date = new Date();
-    const hour = req.query.h;
+    const hour = req.query.h;0
     const day = req.query.d;
     const month  = req.query.m;
-    const fdate = '2020-'+month+'-'+day+'T1'+hour+':00:00.000Z';
-    const ldate = '2020-'+month+'-'+day+'T1'+hour+':59:00.000Z';
+    const t = req.query.t;
+    const fdate = '2020-'+month+'-'+day+'T'+t+hour+':00:00.000Z';
+    const ldate = '2020-'+month+'-'+day+'T'+t+hour+':59:00.000Z'; 
     sequelize.query(`select hospitals.* ,h_locations.lat,h_locations.lng
                         from hospitals
                         full outer join h_locations on hospitals.name=h_locations.h_name
                     where time >= '${fdate}' and time <='${ldate}' `,Hospital,{raw:true}).then(function(data){
+
         var fts=[]
         data[0].forEach(element => {
-            console.log(element.lat,element.lng)
-            var ft = {"type":"Feature","properties":element};
+            var ft = {"type":"Feature","properties":element,"geometry":{"type":"Point","coordinates":[parseFloat(element.lat),parseFloat(element.lng)]}};
             fts.push(ft)
         });
-        res.send(fts);
+
+        var coll ={
+            "type": "FeatureCollection",
+                "name": fdate,
+                    "crs": { "type": "name", "properties": {"name":"urn:ogc:def:crs:OGC:1.3:CRS84" } },
+                "features":fts
+            }
+
+        res.send(coll);
     });
 
 
