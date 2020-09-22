@@ -20,7 +20,7 @@ exports.create = (req, res) => {
         type:req.body.type,
         admitted:req.body.admitted,
         doctors:req.body.doctors,
-        nurses:req.body.doctors,
+        nurses:req.body.nurses,
         time:Date()
     };
   
@@ -144,7 +144,7 @@ exports.getRecent=(req,res)=>{
 //gets specific attributes plus locations
 exports.getSpecific = (req,res)=>{
     var date = new Date();
-    const hour = req.query.h;0
+    const hour = req.query.h;
     const day = req.query.d;
     const month  = req.query.m;
     const t = req.query.t;
