@@ -3,7 +3,7 @@ module.exports = app=>{
 
     var router =  require('express').Router();
     router.get('/',(req,res)=>{
-        res.send('home bih');
+        res.send('Welcome To BRYANS PROJECT');
     });
     //creates an entry
     router.post('/',tutorials.create);
