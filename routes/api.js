@@ -2,6 +2,9 @@ module.exports = app=>{
     const tutorials = require('../controller/controller.js');
 
     var router =  require('express').Router();
+    router.get('/',(req,res)=>{
+        res.send('home bih');
+    });
     //creates an entry
     router.post('/',tutorials.create);
     //retrieves all entries
@@ -26,7 +29,7 @@ module.exports = app=>{
 
     // router.delete('/',tutorials.deleteAll);
 
-    app.use('/api',router);
+    app.use('/',router);
 
     
 }
