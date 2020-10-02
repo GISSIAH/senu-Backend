@@ -5,9 +5,11 @@ const bodyParser = require('body-parser');
 //const PORT = process.env.port||4000;
 const app = express();
 
+var corsOptions = {
+    origin: 'https://senu-front.herokuapp.com'
+}
 
-
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 const db = require('./models');
