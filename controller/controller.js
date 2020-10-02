@@ -127,7 +127,7 @@ exports.getRecent=(req,res)=>{
                         
                         var fts=[]
                         data[0].forEach(element => {
-                            var ft = {"type":"Feature","properties":element,"geometry":{"type":"Point","coordinates":[parseFloat(element.lat),parseFloat(element.lng)]}};
+                            var ft = {"type":"Feature","properties":element,"geometry":{"type":"Point","coordinates":[parseFloat(element.lon),parseFloat(element.lat)]}};
                             fts.push(ft)
                         });
                 
