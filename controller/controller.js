@@ -117,13 +117,13 @@ exports.getLocations=(req,res)=>{
 
 //locations with attributes
 exports.getRecent=(req,res)=>{
-    sequelize.query("select recent.*, h_locations.lat,h_locations.lng from  \
+    sequelize.query("select recent.*, h_locations.lat,h_locations.lon from  \
 	                (select hospitals.*  \
 		            from hospitals  \
 		            INNER JOIN  \
 			        (select hospitals.name,max(hospitals.time) max_date from hospitals group by hospitals.name) \
 			        b on hospitals.name = b.name and hospitals.time= b.max_date) as recent \
-	                full outer join h_locations on recent.name=h_locations.h_name",Hospital,{raw:true}).then(function(data){
+	                full outer join h_locations on recent.name=h_locations.name",Hospital,{raw:true}).then(function(data){
                         
                         var fts=[]
                         data[0].forEach(element => {
