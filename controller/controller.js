@@ -178,6 +178,43 @@ exports.delete = (req,res)=>{
 
 };
 
+exports.getGroup = async function (req, res) {
+    var hours = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    var group = {
+        "name": Date(),
+        "data": []
+    };
+    const promises = hours.map(async (hour) => {
+    const day = req.query.d;
+    const month = req.query.m;
+    const t = req.query.t;
+    const fdate = '2020-' + month + '-' + day + 'T' + t + hour + ':00:00.000Z';
+    const ldate = '2020-' + month + '-' + day + 'T' + t + hour + ':59:00.000Z';
+        
+    var coll = {
+        "type": "FeatureCollection",
+        "name": hour,
+        "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+        "features": []
+    }
+    var data = await sequelize.query(`select hospitals.* ,h_locations.lat,h_locations.lon
+                        from hospitals
+                        full outer join h_locations on hospitals.name=h_locations.name
+                    where time >= '${fdate}' and time <='${ldate}' `, Hospital, { raw: true });
+
+    data[0].forEach(element => {
+        var ft = { "type": "Feature", "properties": element, "geometry": { "type": "Point", "coordinates": [parseFloat(element.lon), parseFloat(element.lat)] } };
+        coll.features.push(ft)
+    });
+    console.log(coll)
+    group.data.push(coll)
+    })
+
+
+    await Promise.all(promises)
+    res.send(group);
+}
+
 exports.deleteAll = (req,res)=>{
 
 };
