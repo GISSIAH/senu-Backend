@@ -25,6 +25,8 @@ module.exports = app=>{
     //gets the specific date-time attributes their locations
     router.get('/local/specific',tutorials.getSpecific);
 
+    router.get('local/group',tutorials.getGroup);
+
     // router.delete('/:id',tutorials.delete);
 
     // router.delete('/',tutorials.deleteAll);
