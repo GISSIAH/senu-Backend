@@ -179,17 +179,16 @@ exports.delete = (req,res)=>{
 };
 
 exports.getGroup = async function (req, res) {
-    var hours = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    var T01hours = ['T00','T01', 'T02', 'T03', 'T04', 'T05', 'T06', 'T07', 'T08', 'T09','T10','T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'T17', 'T18', 'T19','T20','T21'];
     var group = {
         "name": Date(),
         "data": []
     };
-    const promises = hours.map(async (hour) => {
+    const promises = T01hours.map(async (hour) => {
     const day = req.query.d;
     const month = req.query.m;
-    const t = req.query.t;
-    const fdate = '2020-' + month + '-' + day + 'T' + t + hour + ':00:00.000Z';
-    const ldate = '2020-' + month + '-' + day + 'T' + t + hour + ':59:00.000Z';
+    const fdate = '2020-' + month + '-' + day +hour + ':00:00.000Z';
+    const ldate = '2020-' + month + '-' + day +hour + ':59:00.000Z';
         
     var coll = {
         "type": "FeatureCollection",
