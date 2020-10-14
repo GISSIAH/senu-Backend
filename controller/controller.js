@@ -3,7 +3,6 @@ const { sequelize } = require('../models');
 const Hospital = db.hospitals;
 const Op = db.Sequelize.Op;
 const Sequelize = require('sequelize');
-
 exports.create = (req, res) => {
     console.log(req.body);
     // Validate request
@@ -13,7 +12,6 @@ exports.create = (req, res) => {
       });
       return;
     }
-
     // Create a Tutorial
     const hospital = {
         name:req.body.name,
@@ -23,7 +21,6 @@ exports.create = (req, res) => {
         nurses:req.body.nurses,
         time:Date()
     };
-  
     // Save Tutorial in the database
     Hospital.create(hospital)
       .then(data => {
@@ -36,7 +33,6 @@ exports.create = (req, res) => {
         });
       });
   };
-
   //finds all existing records 
 exports.findAll = (req,res)=>{
     console.log(req.query)
@@ -49,7 +45,6 @@ exports.findAll = (req,res)=>{
             err.message || 'Some error occured when retrieving hospitals'
         });
     });
-
 };
  // finds all records for a particular name
 exports.findOneMany = (req,res)=>{
@@ -62,7 +57,6 @@ exports.findOneMany = (req,res)=>{
             err.message || 'Some error occured when retrieving hospital'
         });
     });
-
 };
 //get specific hour attributes
 exports.findAllSpecific = (req,res)=>{
@@ -83,12 +77,7 @@ exports.findAllSpecific = (req,res)=>{
         });
         res.send(fts);
     });
-
-
 }
-
-
-
 //recent attributes
 exports.findAllRecent = (req,res)=>{
     sequelize.query("select hospitals.* from hospitals  INNER JOIN ( select hospitals.name,max(hospitals.time) max_date from hospitals group by hospitals.name) b on hospitals.name = b.name and hospitals.time= b.max_date",Hospital,{raw:true}).then(function(data){
@@ -100,8 +89,6 @@ exports.findAllRecent = (req,res)=>{
         });
         res.send(fts);
     });
-
-
 }
 // raw locations not much attributes
 exports.getLocations=(req,res)=>{
@@ -114,7 +101,6 @@ exports.getLocations=(req,res)=>{
         res.send(fts);
     });
 }
-
 //locations with attributes
 exports.getRecent=(req,res)=>{
     sequelize.query("select recent.*, h_locations.lat,h_locations.lon from  \
@@ -123,14 +109,12 @@ exports.getRecent=(req,res)=>{
 		            INNER JOIN  \
 			        (select hospitals.name,max(hospitals.time) max_date from hospitals group by hospitals.name) \
 			        b on hospitals.name = b.name and hospitals.time= b.max_date) as recent \
-	                full outer join h_locations on recent.name=h_locations.name",Hospital,{raw:true}).then(function(data){
-                        
+	                full outer join h_locations on recent.name=h_locations.name",Hospital,{raw:true}).then(function(data){      
                         var fts=[]
                         data[0].forEach(element => {
                             var ft = {"type":"Feature","properties":element,"geometry":{"type":"Point","coordinates":[parseFloat(element.lon),parseFloat(element.lat)]}};
                             fts.push(ft)
                         });
-                
                         var coll ={
                             "type": "FeatureCollection",
                                 "name": 'Latest',
@@ -154,32 +138,25 @@ exports.getSpecific = (req,res)=>{
                         from hospitals
                         full outer join h_locations on hospitals.name=h_locations.h_name
                     where time >= '${fdate}' and time <='${ldate}' `,Hospital,{raw:true}).then(function(data){
-
         var fts=[]
         data[0].forEach(element => {
             var ft = {"type":"Feature","properties":element,"geometry":{"type":"Point","coordinates":[parseFloat(element.lat),parseFloat(element.lng)]}};
             fts.push(ft)
         });
-
         var coll ={
             "type": "FeatureCollection",
                 "name": fdate,
                     "crs": { "type": "name", "properties": {"name":"urn:ogc:def:crs:OGC:1.3:CRS84" } },
                 "features":fts
             }
-
         res.send(coll);
     });
-
-
 }
-
 exports.delete = (req,res)=>{
 
 };
-
 exports.getGroup = async function (req, res) {
-    var T01hours = ['T00','T01', 'T02', 'T03', 'T04', 'T05', 'T06', 'T07', 'T08', 'T09','T10','T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'T17', 'T18', 'T19','T20','T21'];
+    var T01hours = ['T00','T01','T02','T03','T04','T05','T06','T07','T08','T09','T10','T11','T12','T13','T14','T15','T16','T17','T18','T19','T20','T21'];
     var group = {
         "name": Date(),
         "data": []
@@ -188,8 +165,7 @@ exports.getGroup = async function (req, res) {
     const day = req.query.d;
     const month = req.query.m;
     const fdate = '2020-' + month + '-' + day +hour + ':00:00.000Z';
-    const ldate = '2020-' + month + '-' + day +hour + ':59:00.000Z';
-        
+    const ldate = '2020-' + month + '-' + day +hour + ':59:00.000Z';    
     var coll = {
         "type": "FeatureCollection",
         "name": hour,
@@ -200,7 +176,6 @@ exports.getGroup = async function (req, res) {
                         from hospitals
                         full outer join h_locations on hospitals.name=h_locations.name
                     where time >= '${fdate}' and time <='${ldate}' `, Hospital, { raw: true });
-
     data[0].forEach(element => {
         var ft = { "type": "Feature", "properties": element, "geometry": { "type": "Point", "coordinates": [parseFloat(element.lon), parseFloat(element.lat)] } };
         coll.features.push(ft)
@@ -208,12 +183,9 @@ exports.getGroup = async function (req, res) {
     console.log(coll)
     group.data.push(coll)
     })
-
-
     await Promise.all(promises)
     res.send(group);
 }
-
 exports.deleteAll = (req,res)=>{
 
 };

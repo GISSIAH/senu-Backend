@@ -1,6 +1,5 @@
 module.exports = app=>{
     const tutorials = require('../controller/controller.js');
-
     var router =  require('express').Router();
     router.get('/',(req,res)=>{
         res.send('Welcome To BRYANS PROJECT');
@@ -15,23 +14,15 @@ module.exports = app=>{
     router.get('/recent/',tutorials.findAllRecent);
      //gets all hour specific attributes for every hospital 
     router.get('/specific/',tutorials.findAllSpecific);
-    
-
-
     //gets locations for all hospitals
     router.get('/local',tutorials.getLocations);
     //gets recent attributes for every hospital with its location
     router.get('/local/recent',tutorials.getRecent);
     //gets the specific date-time attributes their locations
     router.get('/local/specific',tutorials.getSpecific);
-
+    //gets daily localation with attributes in groups
     router.get('/local/group',tutorials.getGroup);
-
     // router.delete('/:id',tutorials.delete);
-
     // router.delete('/',tutorials.deleteAll);
-
     app.use('/',router);
-
-    
 }

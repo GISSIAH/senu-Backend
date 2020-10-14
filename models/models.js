@@ -18,7 +18,6 @@ module.exports = (sequelize,Sequelize)=>{
         time: {
             type: Sequelize.DATE
         }
-
     });
     return Hospital;
 }
