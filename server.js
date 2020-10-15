@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 //const PORT = process.env.port||4000;
 const app = express();
 var corsOptions = {
-    origin: ['https://senu-front.herokuapp.com','http://localhost:5000/']
+    origin: 'https://senu-front.herokuapp.com',
 }
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
