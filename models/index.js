@@ -6,7 +6,7 @@ const sequelize = new Sequelize(dbConfig.DB,dbConfig.USER,dbConfig.PASSWORD,{
     operatorsAliases: false,
     timezone: '+02:00',
     dialectOptions: {
-        useUTC: false //for reading from database
+        useUTC: true//for reading from database
     },
     pool : {
         max:dbConfig.pool.max,
