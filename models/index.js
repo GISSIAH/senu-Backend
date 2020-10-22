@@ -4,6 +4,10 @@ const sequelize = new Sequelize(dbConfig.DB,dbConfig.USER,dbConfig.PASSWORD,{
     host:dbConfig.HOST,
     dialect: dbConfig.dialect,
     operatorsAliases: false,
+    timezone: '+02:00',
+    dialectOptions: {
+        useUTC: false //for reading from database
+    },
     pool : {
         max:dbConfig.pool.max,
         min:dbConfig.pool.min,
