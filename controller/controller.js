@@ -19,7 +19,7 @@ exports.create = (req, res) => {
         admitted:req.body.admitted,
         doctors:req.body.doctors,
         nurses:req.body.nurses,
-        time:Date()
+        time:req.body.time
     };
     // Save Tutorial in the database
     Hospital.create(hospital)
