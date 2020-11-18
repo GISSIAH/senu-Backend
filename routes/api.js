@@ -22,6 +22,9 @@ module.exports = app=>{
     router.get('/local/specific',ho.getSpecific);
     //gets daily localation with attributes in groups
     router.get('/local/group',ho.getGroup);
+    router.get('/uptime',ho.getlatestTime);
+
+    router.get('/month/',ho.getMonth);
     // router.delete('/:id',ho.delete);
     // router.delete('/',ho.deleteAll);
     app.use('/',router);

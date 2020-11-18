@@ -3,6 +3,7 @@ const { sequelize } = require('../models');
 const Hospital = db.hospitals;
 const Op = db.Sequelize.Op;
 const Sequelize = require('sequelize');
+const moment = require('moment-timezone')
 exports.create = (req, res) => {
     console.log(req.body);
     // Validate request
@@ -38,6 +39,11 @@ exports.findAll = (req,res)=>{
     console.log(req.query)
     //var condition = name ? {title:{[Op.iLike]: `%${name}%`}}: null;
     Hospital.findAll({where:null}).then(data=>{
+        data.forEach((hos) => {
+            hos.dataValues.time = moment(hos.dataValues.time).toString()
+            hos.dataValues.createdAt = moment(hos.dataValues.createdAt).toString()
+            hos.dataValues.updatedAt = moment(hos.dataValues.updatedAt).toString()
+        })
         res.send(data);
     }).catch(err=>{
         res.status(500).send({
@@ -50,6 +56,11 @@ exports.findAll = (req,res)=>{
 exports.findOneMany = (req,res)=>{
     const id = req.params.id;
     Hospital.findAll({where:{name:id}}).then(data=>{
+        data.forEach((hos) => {
+            hos.dataValues.time = moment(hos.dataValues.time).toString()
+            hos.dataValues.createdAt = moment(hos.dataValues.createdAt).toString()
+            hos.dataValues.updatedAt = moment(hos.dataValues.updatedAt).toString()
+        })
         res.send(data);
     }).catch(err=>{
         res.status(500).send({
@@ -75,6 +86,11 @@ exports.findAllSpecific = (req,res)=>{
             var ft = {"type":"Feature","properties":element};
             fts.push(ft)
         });
+        fts.forEach((hos) => {
+            hos.properties.time = moment(hos.properties.time).toString()
+            hos.properties.createdAt = moment(hos.properties.createdAt).toString()
+            hos.properties.updatedAt = moment(hos.properties.updatedAt).toString()
+        })
         res.send(fts);
     });
 }
@@ -87,6 +103,11 @@ exports.findAllRecent = (req,res)=>{
             var ft = {"type":"Feature","properties":element};
             fts.push(ft)
         });
+        fts.forEach((hos) => {
+            hos.properties.time = moment(hos.properties.time).toString()
+            hos.properties.createdAt = moment(hos.properties.createdAt).toString()
+            hos.properties.updatedAt = moment(hos.properties.updatedAt).toString()
+        })
         res.send(fts);
     });
 }
@@ -115,6 +136,11 @@ exports.getRecent=(req,res)=>{
                             var ft = {"type":"Feature","properties":element,"geometry":{"type":"Point","coordinates":[parseFloat(element.lon),parseFloat(element.lat)]}};
                             fts.push(ft)
                         });
+                        fts.forEach((hos) => {
+                            hos.properties.time = moment(hos.properties.time).toString()
+                            hos.properties.createdAt = moment(hos.properties.createdAt).toString()
+                            hos.properties.updatedAt = moment(hos.properties.updatedAt).toString()
+                        })
                         var coll ={
                             "type": "FeatureCollection",
                                 "name": 'Latest',
@@ -143,6 +169,11 @@ exports.getSpecific = (req,res)=>{
             var ft = {"type":"Feature","properties":element,"geometry":{"type":"Point","coordinates":[parseFloat(element.lat),parseFloat(element.lng)]}};
             fts.push(ft)
         });
+        fts.forEach((hos) => {
+            hos.properties.time = moment(hos.properties.time).toString()
+            hos.properties.createdAt = moment(hos.properties.createdAt).toString()
+            hos.properties.updatedAt = moment(hos.properties.updatedAt).toString()
+        })
         var coll ={
             "type": "FeatureCollection",
                 "name": fdate,
@@ -152,43 +183,94 @@ exports.getSpecific = (req,res)=>{
         res.send(coll);
     });
 }
+exports.getlatestTime=(req,res)=>{
+    sequelize.query('select "time" from hospitals order by "time" desc limit 1',Hospital, { raw: true }).then(function(data){
+        var t = {'Latest':data[0][0].time}
+        t.Latest = moment(t.Latest).toString()
+        res.send(t)
+
+    })
+}
+exports.getMonth= (req,res)=>{
+    const hos_id = req.query.id;
+    const m = req.query.m;
+    const y= req.query.y
+    const days = daysInAmonth(m,y)
+    console.log(days)
+    sequelize.query(`select * from hospitals where name='${hos_id}' and time>'${y}-${m}-01T00:00:00+02' and time<'${y}-${m}-${days}T23:59:00+02'`,Hospital, { raw: true }).then(function(data){
+    data[0].forEach(hos=>{ 
+        console.log(hos)
+            hos.time = moment(hos.time).toString()
+            hos.createdAt = moment(hos.createdAt).toString()
+            hos.updatedAt = moment(hos.updatedAt).toString()
+            
+        })
+    
+        res.send(data[0]);
+    })
+}
 exports.delete = (req,res)=>{
 
 };
 exports.getGroup = async function (req, res) {
-    var T01hours = ['T00','T01','T02','T03','T04','T05','T06','T07','T08','T09','T10','T11','T12','T13','T14','T15','T16','T17','T18','T19','T20','T21'];
+    //var T01hours = ['T00', 'T01', 'T02', 'T03', 'T04', 'T05', 'T06', 'T07', 'T08', 'T09', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'T17', 'T18', 'T19', 'T20', 'T21','T22','T23'];
+    var hrs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,22,23]
     var group = {
         "name": Date(),
         "data": []
     };
-    const promises = T01hours.map(async (hour) => {
-    const day = req.query.d;
-    const month = req.query.m;
-    const fdate = '2020-' + month + '-' + day +hour + ':00:00.000Z';
-    const ldate = '2020-' + month + '-' + day +hour + ':59:00.000Z';    
-    var coll = {
-        "type": "FeatureCollection",
-        "name": hour,
-        "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-        "features": []
-    }
-    var data = await sequelize.query(`select hospitals.* ,h_locations.lat,h_locations.lon
+    const promises = hrs.map(async (hour) => {
+        const day = req.query.d;
+        const month = req.query.m;
+        const hr = decideQuery(hour)
+        const fdate = '2020-' + month + '-' + day + hr + ':00:00+02';
+        const ldate = '2020-' + month + '-' + day + hr + ':59:00+02';
+        var fts=[]
+        var data = await sequelize.query(`select hospitals.* ,h_locations.lat,h_locations.lon
                         from hospitals
                         full outer join h_locations on hospitals.name=h_locations.name
                     where time >= '${fdate}' and time <='${ldate}' `, Hospital, { raw: true });
-    data[0].forEach(element => {
-        var ft = { "type": "Feature", "properties": element, "geometry": { "type": "Point", "coordinates": [parseFloat(element.lon), parseFloat(element.lat)] } };
-        coll.features.push(ft)
-    });
-    console.log(coll)
-    group.data.push(coll)
+        data[0].forEach(element => {
+            var ft = { "type": "Feature", "properties": element, "geometry": { "type": "Point", "coordinates": [parseFloat(element.lon), parseFloat(element.lat)] } };
+            fts.push(ft)
+        });
+        fts.forEach((hos) => {
+            hos.properties.time = moment(hos.properties.time).toString()
+            hos.properties.createdAt = moment(hos.properties.createdAt).toString()
+            hos.properties.updatedAt = moment(hos.properties.updatedAt).toString()
+        })
+        
+        var coll = {
+            "type": "FeatureCollection",
+            "name": hour,
+            "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+            "features": fts
+        }
+        group.data.push(coll)
     })
     await Promise.all(promises)
+    console.log(group.data.length)
+    group.data.sort(function(a, b) {
+        return parseFloat(a.name) - parseFloat(b.name);
+    });
+    
     res.send(group);
 }
 exports.deleteAll = (req,res)=>{
 
 };
+function decideQuery(hour){
+    if(hour<10){
+        return 'T0'+hour;
+    }else{
+        return 'T'+hour;
+    }
+}
+
+function daysInAmonth(mon,year){
+    return new Date(year,mon,0).getDate();
+}
+
 
 
 
