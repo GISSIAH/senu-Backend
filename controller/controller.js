@@ -40,9 +40,9 @@ exports.findAll = (req,res)=>{
     //var condition = name ? {title:{[Op.iLike]: `%${name}%`}}: null;
     Hospital.findAll({where:null}).then(data=>{
         data.forEach((hos) => {
-            hos.dataValues.time = moment(hos.dataValues.time).toString()
-            hos.dataValues.createdAt = moment(hos.dataValues.createdAt).toString()
-            hos.dataValues.updatedAt = moment(hos.dataValues.updatedAt).toString()
+            hos.dataValues.time = moment.tz(hos.dataValues.time, "Africa/Blantyre").toString();
+            hos.dataValues.createdAt = moment.tz(hos.dataValues.createdAt, "Africa/Blantyre").toString();
+            hos.dataValues.updatedAt = moment.tz(hos.dataValues.updatedAt, "Africa/Blantyre").toString();
         })
         res.send(data);
     }).catch(err=>{
@@ -57,9 +57,11 @@ exports.findOneMany = (req,res)=>{
     const id = req.params.id;
     Hospital.findAll({where:{name:id}}).then(data=>{
         data.forEach((hos) => {
-            hos.dataValues.time = moment(hos.dataValues.time).toString()
-            hos.dataValues.createdAt = moment(hos.dataValues.createdAt).toString()
-            hos.dataValues.updatedAt = moment(hos.dataValues.updatedAt).toString()
+
+            
+            hos.dataValues.time = moment.tz(hos.dataValues.time, "Africa/Blantyre").toString();
+            hos.dataValues.createdAt = moment.tz(hos.dataValues.createdAt, "Africa/Blantyre").toString();
+            hos.dataValues.updatedAt = moment.tz(hos.dataValues.updatedAt, "Africa/Blantyre").toString();
         })
         res.send(data);
     }).catch(err=>{
@@ -87,9 +89,9 @@ exports.findAllSpecific = (req,res)=>{
             fts.push(ft)
         });
         fts.forEach((hos) => {
-            hos.properties.time = moment(hos.properties.time).toString()
-            hos.properties.createdAt = moment(hos.properties.createdAt).toString()
-            hos.properties.updatedAt = moment(hos.properties.updatedAt).toString()
+            hos.properties.time = moment.tz(hos.properties.time, "Africa/Blantyre").toString();
+            hos.properties.createdAt = moment.tz(hos.properties.createdAt, "Africa/Blantyre").toString();
+            hos.properties.updatedAt = moment.tz(hos.properties.updatedAt, "Africa/Blantyre").toString();
         })
         res.send(fts);
     });
@@ -104,9 +106,9 @@ exports.findAllRecent = (req,res)=>{
             fts.push(ft)
         });
         fts.forEach((hos) => {
-            hos.properties.time = moment(hos.properties.time).toString()
-            hos.properties.createdAt = moment(hos.properties.createdAt).toString()
-            hos.properties.updatedAt = moment(hos.properties.updatedAt).toString()
+            hos.properties.time = moment.tz(hos.properties.time, "Africa/Blantyre").toString();
+            hos.properties.createdAt = moment.tz(hos.properties.createdAt, "Africa/Blantyre").toString();
+            hos.properties.updatedAt = moment.tz(hos.properties.updatedAt, "Africa/Blantyre").toString();
         })
         res.send(fts);
     });
@@ -138,8 +140,8 @@ exports.getRecent=(req,res)=>{
                         });
                         fts.forEach((hos) => {
                             hos.properties.time = moment.tz(hos.properties.time, "Africa/Blantyre").toString();
-                            hos.properties.createdAt = moment(hos.properties.createdAt).toString()
-                            hos.properties.updatedAt = moment(hos.properties.updatedAt).toString()
+                            hos.properties.createdAt = moment.tz(hos.properties.createdAt, "Africa/Blantyre").toString();
+                            hos.properties.updatedAt = moment.tz(hos.properties.updatedAt, "Africa/Blantyre").toString();
                         })
                         var coll ={
                             "type": "FeatureCollection",
@@ -170,9 +172,9 @@ exports.getSpecific = (req,res)=>{
             fts.push(ft)
         });
         fts.forEach((hos) => {
-            hos.properties.time = moment(hos.properties.time).toString()
-            hos.properties.createdAt = moment(hos.properties.createdAt).toString()
-            hos.properties.updatedAt = moment(hos.properties.updatedAt).toString()
+            hos.properties.time = moment.tz(hos.properties.time, "Africa/Blantyre").toString();
+            hos.properties.createdAt = moment.tz(hos.properties.createdAt, "Africa/Blantyre").toString();
+            hos.properties.updatedAt = moment.tz(hos.properties.updatedAt, "Africa/Blantyre").toString();
         })
         var coll ={
             "type": "FeatureCollection",
@@ -200,10 +202,11 @@ exports.getMonth= (req,res)=>{
     sequelize.query(`select * from hospitals where name='${hos_id}' and time>'${y}-${m}-01T00:00:00+02' and time<'${y}-${m}-${days}T23:59:00+02'`,Hospital, { raw: true }).then(function(data){
     data[0].forEach(hos=>{ 
         console.log(hos)
-            hos.time = moment(hos.time).toString()
-            hos.createdAt = moment(hos.createdAt).toString()
-            hos.updatedAt = moment(hos.updatedAt).toString()
-            
+        
+            hos.properties.time = moment.tz(hos.properties.time, "Africa/Blantyre").toString();
+            hos.properties.createdAt = moment.tz(hos.properties.createdAt, "Africa/Blantyre").toString();
+            hos.properties.updatedAt = moment.tz(hos.properties.updatedAt, "Africa/Blantyre").toString();
+    
         })
     
         res.send(data[0]);
@@ -235,9 +238,9 @@ exports.getGroup = async function (req, res) {
             fts.push(ft)
         });
         fts.forEach((hos) => {
-            hos.properties.time = moment(hos.properties.time).toString()
-            hos.properties.createdAt = moment(hos.properties.createdAt).toString()
-            hos.properties.updatedAt = moment(hos.properties.updatedAt).toString()
+            hos.properties.time = moment.tz(hos.properties.time, "Africa/Blantyre").toString();
+            hos.properties.createdAt = moment.tz(hos.properties.createdAt, "Africa/Blantyre").toString();
+            hos.properties.updatedAt = moment.tz(hos.properties.updatedAt, "Africa/Blantyre").toString();
         })
         
         var coll = {
