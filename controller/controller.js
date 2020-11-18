@@ -75,8 +75,8 @@ exports.findAllSpecific = (req,res)=>{
     const hour = req.query.h;
     const day = req.query.d;
     const month  = req.query.m;
-    const fdate = '2020-'+month+'-'+day+'T1'+hour+':00:00.000Z';
-    const ldate = '2020-'+month+'-'+day+'T1'+hour+':59:00.000Z';
+    const fdate = '2020-'+month+'-'+day+'T1'+hour+':00:00+02';
+    const ldate = '2020-'+month+'-'+day+'T1'+hour+':59:00+02';
     sequelize.query(`select * \
                     from hospitals \
                     where time >= '${fdate}' and time <='${ldate}' `,Hospital,{raw:true}).then(function(data){
@@ -158,8 +158,8 @@ exports.getSpecific = (req,res)=>{
     const day = req.query.d;
     const month  = req.query.m;
     const t = req.query.t;
-    const fdate = '2020-'+month+'-'+day+'T'+t+hour+':00:00.000Z';
-    const ldate = '2020-'+month+'-'+day+'T'+t+hour+':59:00.000Z'; 
+    const fdate = '2020-'+month+'-'+day+'T'+t+hour+':00:00+02';
+    const ldate = '2020-'+month+'-'+day+'T'+t+hour+':59:00.+02'; 
     sequelize.query(`select hospitals.* ,h_locations.lat,h_locations.lng
                         from hospitals
                         full outer join h_locations on hospitals.name=h_locations.h_name
