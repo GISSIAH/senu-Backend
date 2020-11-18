@@ -137,7 +137,7 @@ exports.getRecent=(req,res)=>{
                             fts.push(ft)
                         });
                         fts.forEach((hos) => {
-                            hos.properties.time = moment(hos.properties.time).toString()
+                            hos.properties.time = moment.tz(hos.properties.time, "Africa/Blantyre").toString();
                             hos.properties.createdAt = moment(hos.properties.createdAt).toString()
                             hos.properties.updatedAt = moment(hos.properties.updatedAt).toString()
                         })
