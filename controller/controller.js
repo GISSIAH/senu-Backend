@@ -188,7 +188,8 @@ exports.getSpecific = (req,res)=>{
 exports.getlatestTime=(req,res)=>{
     sequelize.query('select "time" from hospitals order by "time" desc limit 1',Hospital, { raw: true }).then(function(data){
         var t = {'Latest':data[0][0].time}
-        t.Latest = moment(t.Latest).toString()
+        t.Latest = moment.tz(t.Latest, "Africa/Blantyre").toString();
+
         res.send(t)
 
     })
