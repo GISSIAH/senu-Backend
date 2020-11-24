@@ -260,6 +260,35 @@ exports.getGroup = async function (req, res) {
     
     res.send(group);
 }
+exports.getDayGroup = (req,res)=>{
+    const id = req.query.id
+    const d = req.query.d
+    const m = req.query.m
+    const y = req.query.y 
+    const fdate = `${y}-${m}-${d}T00:00:00+02`
+    const ldate = `${y}-${m}-${d}T23:59:00+02`
+    sequelize.query(`select * from hospitals where "time">'${fdate}' and "time"<='${ldate}' and "name"='${id}' `, Hospital, { raw: true }).then(function(data){
+        
+        var coll = {
+            'name':req.query.id,
+            'features':[]
+        }
+        data[0].forEach(ele=>{
+            console.log(ele.time)
+            const t = String(ele.time) 
+            const h = t.substring(16,18)
+            var ft = {
+                'hour':h,
+                'admitted':ele.admitted,
+                'doctors':ele.doctors,
+                'nurses':ele.nurses,
+            }
+            coll.features.push(ft)
+        })
+ 
+        res.send(coll)
+    })
+}
 exports.deleteAll = (req,res)=>{
 
 };
@@ -270,7 +299,6 @@ function decideQuery(hour){
         return 'T'+hour;
     }
 }
-
 function daysInAmonth(mon,year){
     return new Date(year,mon,0).getDate();
 }

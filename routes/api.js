@@ -22,6 +22,8 @@ module.exports = app=>{
     router.get('/local/specific',ho.getSpecific);
     //gets daily localation with attributes in groups
     router.get('/local/group',ho.getGroup);
+     //gets daily data for a specific hos
+     router.get('/daily/',ho.getDayGroup)
     router.get('/uptime',ho.getlatestTime);
 
     router.get('/month/',ho.getMonth);
