@@ -275,6 +275,7 @@ exports.getDayGroup = (req,res)=>{
         }
         data[0].forEach(ele=>{
             console.log(ele.time)
+            ele.time = moment.tz(ele.time, "Africa/Blantyre").toString();
             const t = String(ele.time) 
             const h = t.substring(16,18)
             var ft = {
