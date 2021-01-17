@@ -353,6 +353,9 @@ function decideQuery(hour){
 function daysInAmonth(mon,year){
     return new Date(year,mon,0).getDate();
 }
+function generateHour(hour){
+    return hour+':00';
+}
 
 
 
