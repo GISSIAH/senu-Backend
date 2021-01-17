@@ -1,19 +1,22 @@
+//importing modules: the database model, sequelize, moment-timezone
 const db = require('../models');
 const { sequelize } = require('../models');
 const Hospital = db.hospitals;
 const Op = db.Sequelize.Op;
 const Sequelize = require('sequelize');
 const moment = require('moment-timezone')
+
+//creates the hospital record
 exports.create = (req, res) => {
     console.log(req.body);
     // Validate request
    if (!req.body.name) {
       res.status(400).send({
-        message: "Content can not be nuttt"
+        message: "Content can not be an entry"
       });
       return;
     }
-    // Create a Tutorial
+    // Creates a record body
     const hospital = {
         name:req.body.name,
         type:req.body.type,
@@ -22,7 +25,7 @@ exports.create = (req, res) => {
         nurses:req.body.nurses,
         time:req.body.time
     };
-    // Save Tutorial in the database
+    // Saves record in the database
     Hospital.create(hospital)
       .then(data => {
         res.send(data);
@@ -37,7 +40,6 @@ exports.create = (req, res) => {
   //finds all existing records 
 exports.findAll = (req,res)=>{
     console.log(req.query)
-    //var condition = name ? {title:{[Op.iLike]: `%${name}%`}}: null;
     Hospital.findAll({where:null}).then(data=>{
         data.forEach((hos) => {
             hos.dataValues.time = moment.tz(hos.dataValues.time, "Africa/Blantyre").toString();
@@ -48,7 +50,7 @@ exports.findAll = (req,res)=>{
     }).catch(err=>{
         res.status(500).send({
             message:
-            err.message || 'Some error occured when retrieving hospitals'
+            err.message || 'Some error occured when retrieving hospitals records'
         });
     });
 };
@@ -57,8 +59,7 @@ exports.findOneMany = (req,res)=>{
     const id = req.params.id;
     Hospital.findAll({where:{name:id}}).then(data=>{
         data.forEach((hos) => {
-
-            
+//adjust the time to the correct timezone
             hos.dataValues.time = moment.tz(hos.dataValues.time, "Africa/Blantyre").toString();
             hos.dataValues.createdAt = moment.tz(hos.dataValues.createdAt, "Africa/Blantyre").toString();
             hos.dataValues.updatedAt = moment.tz(hos.dataValues.updatedAt, "Africa/Blantyre").toString();
@@ -73,7 +74,7 @@ exports.findOneMany = (req,res)=>{
 };
 //get specific hour attributes
 exports.findAllSpecific = (req,res)=>{
-    var date = new Date();
+// getting the parameters in the url query
     const hour = req.query.h;
     const day = req.query.d;
     const month  = req.query.m;
@@ -89,6 +90,7 @@ exports.findAllSpecific = (req,res)=>{
             fts.push(ft)
         });
         fts.forEach((hos) => {
+//adjust the time to the correct timezone
             hos.properties.time = moment.tz(hos.properties.time, "Africa/Blantyre").toString();
             hos.properties.createdAt = moment.tz(hos.properties.createdAt, "Africa/Blantyre").toString();
             hos.properties.updatedAt = moment.tz(hos.properties.updatedAt, "Africa/Blantyre").toString();
@@ -106,6 +108,7 @@ exports.findAllRecent = (req,res)=>{
             fts.push(ft)
         });
         fts.forEach((hos) => {
+//adjust the time to the correct timezone
             hos.properties.time = moment.tz(hos.properties.time, "Africa/Blantyre").toString();
             hos.properties.createdAt = moment.tz(hos.properties.createdAt, "Africa/Blantyre").toString();
             hos.properties.updatedAt = moment.tz(hos.properties.updatedAt, "Africa/Blantyre").toString();
@@ -139,6 +142,7 @@ exports.getRecent=(req,res)=>{
                             fts.push(ft)
                         });
                         fts.forEach((hos) => {
+//adjust the time to the correct timezone
                             hos.properties.time = moment.tz(hos.properties.time, "Africa/Blantyre").toString();
                             hos.properties.createdAt = moment.tz(hos.properties.createdAt, "Africa/Blantyre").toString();
                             hos.properties.updatedAt = moment.tz(hos.properties.updatedAt, "Africa/Blantyre").toString();
@@ -156,10 +160,12 @@ exports.getRecent=(req,res)=>{
 //gets specific attributes plus locations
 exports.getSpecific = (req,res)=>{
     var date = new Date();
+// getting the parameters set in the url query
     const hour = req.query.h;
     const day = req.query.d;
     const month  = req.query.m;
     const t = req.query.t;
+//defining the the date-time period
     const fdate = '2020-'+month+'-'+day+'T'+t+hour+':00:00+02';
     const ldate = '2020-'+month+'-'+day+'T'+t+hour+':59:00.+02'; 
     sequelize.query(`select hospitals.* ,h_locations.lat,h_locations.lng
@@ -172,10 +178,12 @@ exports.getSpecific = (req,res)=>{
             fts.push(ft)
         });
         fts.forEach((hos) => {
+//adjust the time to the correct timezone
             hos.properties.time = moment.tz(hos.properties.time, "Africa/Blantyre").toString();
             hos.properties.createdAt = moment.tz(hos.properties.createdAt, "Africa/Blantyre").toString();
             hos.properties.updatedAt = moment.tz(hos.properties.updatedAt, "Africa/Blantyre").toString();
         })
+//defining a GeoJSON of the features
         var coll ={
             "type": "FeatureCollection",
                 "name": fdate,
@@ -185,15 +193,16 @@ exports.getSpecific = (req,res)=>{
         res.send(coll);
     });
 }
+//gets the last time a user enetered a record in the database
 exports.getlatestTime=(req,res)=>{
     sequelize.query('select "time" from hospitals order by "time" desc limit 1',Hospital, { raw: true }).then(function(data){
         var t = {'Latest':data[0][0].time}
         t.Latest = moment.tz(t.Latest, "Africa/Blantyre").toString();
-
         res.send(t)
 
     })
 }
+//gets monthly attributes for a particular hospital
 exports.getMonth= (req,res)=>{
     const hos_id = req.query.id;
     const m = req.query.m;
@@ -203,7 +212,7 @@ exports.getMonth= (req,res)=>{
     sequelize.query(`select * from hospitals where name='${hos_id}' and time>'${y}-${m}-01T00:00:00+02' and time<'${y}-${m}-${days}T23:59:00+02'`,Hospital, { raw: true }).then(function(data){
     data[0].forEach(hos=>{ 
         console.log(hos)
-        
+//adjust the time to the correct timezone
             hos.properties.time = moment.tz(hos.properties.time, "Africa/Blantyre").toString();
             hos.properties.createdAt = moment.tz(hos.properties.createdAt, "Africa/Blantyre").toString();
             hos.properties.updatedAt = moment.tz(hos.properties.updatedAt, "Africa/Blantyre").toString();
@@ -213,9 +222,7 @@ exports.getMonth= (req,res)=>{
         res.send(data[0]);
     })
 }
-exports.delete = (req,res)=>{
 
-};
 exports.getGroup = async function (req, res) {
     //var T01hours = ['T00', 'T01', 'T02', 'T03', 'T04', 'T05', 'T06', 'T07', 'T08', 'T09', 'T10', 'T11', 'T12', 'T13', 'T14', 'T15', 'T16', 'T17', 'T18', 'T19', 'T20', 'T21','T22','T23'];
     var hrs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,22,23]
@@ -239,6 +246,7 @@ exports.getGroup = async function (req, res) {
             fts.push(ft)
         });
         fts.forEach((hos) => {
+//adjust the time to the correct timezone
             hos.properties.time = moment.tz(hos.properties.time, "Africa/Blantyre").toString();
             hos.properties.createdAt = moment.tz(hos.properties.createdAt, "Africa/Blantyre").toString();
             hos.properties.updatedAt = moment.tz(hos.properties.updatedAt, "Africa/Blantyre").toString();
@@ -260,6 +268,7 @@ exports.getGroup = async function (req, res) {
     
     res.send(group);
 }
+//gets a whole days worth of attributes for a particular hospital
 exports.getDayGroup = (req,res)=>{
     const id = req.query.id
     const d = req.query.d
@@ -290,9 +299,50 @@ exports.getDayGroup = (req,res)=>{
         res.send(coll)
     })
 }
-exports.deleteAll = (req,res)=>{
+exports.DownloadDayGroup = async (req,res)=>{
+    const id = req.query.id
+    const d = req.query.d
+    const m = req.query.m
+    const y = req.query.y 
+    const fdate = `${y}-${m}-${d}T00:00:00-08`
+    const ldate = `${y}-${m}-${d}T23:59:00-08`
+    sequelize.query(`select * from hospitals where "time">'${fdate}' and "time"<='${ldate}' and "name"='${id}' `, Hospital, { raw: true }).then(function(data){
+        
+        var coll = {
+            'name':req.query.id,
+            'features':[]
+        }
+        data[0].forEach(ele=>{
+            console.log(ele.time)
+            const t = String(ele.time) 
+            const h = t.substring(16,18)
+            var ft = {
+                'hour':generateHour(h),
+                'admitted':ele.admitted,
+                'doctors':ele.doctors,
+                'nurses':ele.nurses,
+            }
+            coll.features.push(ft)
+        })
+        const csv = new ObjectsToCsv(coll.features)
 
-};
+        const url = './res/'+`${y}${m}${d}_`+req.query.id+'.csv'
+
+        const fname =`${y}-${m}-${d} for `+req.query.id+'.csv';
+        csv.toDisk(url).then(()=>{
+            res.download(url, fname, (err) => {
+                if (err) {
+                  res.status(500).send({
+                    message: "Could not download the file. " + err,
+                  });
+                }
+              });
+        })
+
+    
+    })
+}
+
 function decideQuery(hour){
     if(hour<10){
         return 'T0'+hour;

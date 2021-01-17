@@ -1,6 +1,10 @@
 module.exports = app=>{
+    //importing the functions from the controller file
     const ho = require('../controller/controller.js');
+    //importing router object from module express.js
     var router =  require('express').Router();
+
+    //default route on the server
     router.get('/',(req,res)=>{
         res.send('Welcome To BRYANS PROJECT');
     });
@@ -20,14 +24,14 @@ module.exports = app=>{
     router.get('/local/recent',ho.getRecent);
     //gets the specific date-time attributes their locations
     router.get('/local/specific',ho.getSpecific);
-    //gets daily localation with attributes in groups
+    //gets daily location with attributes in groups
     router.get('/local/group',ho.getGroup);
      //gets daily data for a specific hos
      router.get('/daily/',ho.getDayGroup)
     router.get('/uptime',ho.getlatestTime);
-
+    //gets the monthly attributes for a particular hospital
     router.get('/month/',ho.getMonth);
-    // router.delete('/:id',ho.delete);
-    // router.delete('/',ho.deleteAll);
+    router.get('/files/daily/',ho.DownloadDayGroup)
+    //uses the routes defined above ontop of the default route "/"
     app.use('/',router);
 }
